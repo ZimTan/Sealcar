@@ -19,15 +19,46 @@ recorder.capture_on = True;
 # Start driving:
 action = numpy.array([0, 0.0])
 
-HardCode_steer = [0 for i in range(16)]
-HardCode_throttle = [1 for i in range(14)]
+HardCode_steer = [0 for i in range(17)]
+HardCode_throttle = [1 for i in range(15)]
 
 HardCode_steer += [1 for i in range(15)]
 HardCode_throttle += [0.6 for i in range(17)]
 
-HardCode_steer += [0 for i in range(8)]
-HardCode_throttle += [1 for i in range(8)]
+HardCode_steer += [0 for i in range(5)]
+HardCode_throttle += [1 for i in range(5)]
 
+HardCode_steer += [-1 for i in range(8)]
+HardCode_throttle += [0.6 for i in range(8)]
+
+HardCode_steer += [0 for i in range(11)]
+HardCode_throttle += [1 for i in range(6)]
+HardCode_throttle += [0.6 for i in range(3)]
+HardCode_throttle += [0.3 for i in range(2)]
+
+HardCode_steer += [-1 for i in range(18)]
+HardCode_throttle += [0.5 for i in range(18)]
+
+HardCode_steer += [0 for i in range(8)]
+HardCode_throttle += [1 for i in range(5)]
+HardCode_throttle += [0.6 for i in range(2)]
+HardCode_throttle += [0.3 for i in range(2)]
+
+HardCode_steer += [1 for i in range(16)]
+HardCode_throttle += [0.4 for i in range(16)]
+
+
+HardCode_steer += [0 for i in range(34)]
+HardCode_throttle += [1 for i in range(26)]
+HardCode_throttle += [0.6 for i in range(4)]
+HardCode_throttle += [0.3 for i in range(2)]
+HardCode_throttle += [0.1 for i in range(2)]
+
+HardCode_steer += [1 for i in range(12)]
+HardCode_throttle += [0.3 for i in range(12)]
+
+HardCode_steer += [0 for i in range(2)]
+HardCode_throttle += [1 for i in range(2)]
 counter = 0
 
 while counter < len(HardCode_steer):

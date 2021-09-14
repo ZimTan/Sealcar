@@ -14,7 +14,7 @@ viewer_config = {
 
 # recorder config:
 recorder_config = {
-    'path': '../dataset/rrl1/'
+    'path': 'dataset/rrl1/'
 }
 
 # car config:

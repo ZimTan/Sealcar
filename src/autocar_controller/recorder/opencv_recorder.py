@@ -36,6 +36,8 @@ class OpenCvRecorder(recorder_interface.RecorderInterface):
             return
 
         # JSON data save
+        if 'speed' in data :
+            return
         data_to_save = {'steer': action[0], 'throttle': action[1], 'speed': data['speed']}
         with open(os.path.join(self.config['path'], self.data_base_name + str(self.counter)) + '.json', 'w+') as outfile:
             json.dump(data_to_save, outfile)
