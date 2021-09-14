@@ -1,0 +1,4 @@
+This is the best donkeyCar ever, We will name it SEALCar !
+
+
+Il y a une branche ou la voiture se lance et fait un bout de chemin hardcoder tous en recordant. Ca permet de faire un dataset parfait. Juste lancer le simulator puis lancer le main.py dans src. Le path du data set est a gerer dans le config.py dans src !
