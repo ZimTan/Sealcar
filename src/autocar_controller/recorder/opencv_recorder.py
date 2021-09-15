@@ -4,6 +4,7 @@ import os
 import json
 
 import numpy as np
+from datetime import datetime
 
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
@@ -39,10 +40,12 @@ class OpenCvRecorder(recorder_interface.RecorderInterface):
         if not 'speed' in data :
             return
         data_to_save = {'steer': action[0], 'throttle': action[1], 'speed': data['speed']}
-        with open(os.path.join(self.config['path'], self.data_base_name + str(self.counter)) + '.json', 'w+') as outfile:
+        today  = datetime.now().strftime("%H-%M-%f")
+
+        with open(os.path.join(self.config['path'], self.data_base_name + str(self.counter)) + today + '.json', 'w+') as outfile:
             json.dump(data_to_save, outfile)
 
         # Image numpy array save
-        np.save(os.path.join(self.config['path'], self.image_base_name + str(self.counter)) + '.npy', data['image'])
+        np.save(os.path.join(self.config['path'], self.image_base_name + str(self.counter)) + today + '.npy', data['image'])
 
         self.counter += 1

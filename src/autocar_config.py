@@ -4,7 +4,7 @@
 controller_config = {
     'dead_zone': 0.15,
     'fix_steer': 0.0,
-    'path': 'models_trainned/nvidia_speed_test'
+    'path': 'src/keras/trained_model'
 }
 
 # viewer config:

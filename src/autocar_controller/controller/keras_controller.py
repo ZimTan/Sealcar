@@ -20,6 +20,8 @@ class KerasController(controller_interface.ControllerInterface):
         self.throttle = None
         self.steer = None
         self.model = None
+        self.default_image = None
+        self.default_speed = None
 
         self.listener = keyboard.Listener(on_press=self._on_press)
         self.listener.start()
@@ -50,6 +52,16 @@ class KerasController(controller_interface.ControllerInterface):
         return (image / 127.5) - 1
 
     def set_state(self, data):
+        if ('image' in data.keys()):
+            self.default_image = data['image']
+        else:
+            data['image'] = self.default_image
+
+        if ('speed' in data.keys()):
+            self.default_speed = data['speed']
+        else:
+            data['speed'] = self.default_speed
+
         image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(data['image']), 2)]), dtype=tf.float32)
         speed = tf.convert_to_tensor(np.array([np.array([data['speed']])]), dtype=tf.float32)
 

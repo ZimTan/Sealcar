@@ -2,7 +2,7 @@
 
 # DATASET:
 DATASET = [
-    '../../dataset/rrl1',
+    '../../dataset/fragmented_rrl1',
     ]
 
 # TRAINING PARAMETERS:
