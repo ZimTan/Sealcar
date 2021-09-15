@@ -57,7 +57,6 @@ CAR = client.UnitySimulationClient
 VIEWER = viewer_lib.OpenCvViewer
 RECORDER = opencv_recorder.OpenCvRecorder
 
-
 # Check up:
 # We need to be sur that the controller respect the Controller Interface
 if not issubclass(CONTROLLER, controller_interface.ControllerInterface):
@@ -87,6 +86,7 @@ viewer = VIEWER(autocar_config.viewer_config)
 
 # Set up recorder:
 recorder = RECORDER(autocar_config.recorder_config)
+#recorder.capture_on = True;
 
 # Start driving:
 action = numpy.array([0, 0.0])

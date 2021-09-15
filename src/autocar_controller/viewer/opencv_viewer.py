@@ -12,10 +12,10 @@ class OpenCvViewer(viewer_interface.ViewerInterface):
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = cv2.cvtColor(data['image'], cv2.COLOR_BGR2RGB)
         image = cv2.resize(image, self.config['screen_size'])
-        cv2.imshow('frame',image)
+        #cv2.imshow('frame',image)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            return False
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+         #   return False
         
     def on(self):
         """ Should turn on the view """

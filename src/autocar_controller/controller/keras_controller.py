@@ -13,6 +13,8 @@ from tensorflow.keras.layers import Dense
 from pynput import keyboard
 from pynput.keyboard import Key
 
+import cv2
+
 # The keras Controller Class.
 class KerasController(controller_interface.ControllerInterface):
     def __init__(self, config):
@@ -48,6 +50,20 @@ class KerasController(controller_interface.ControllerInterface):
         im = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140])
         return (im / 127.5) - 1
 
+    def segmentation(self, image):
+
+        hls_img = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
+        lum_img = hls_img[:,:,1]
+
+        frag_img = cv2.inRange(lum_img, 215, 255)
+
+        cropped_img = frag_img
+        cropped_img[:50,:] = 0
+
+        final_img = cv2.merge((cropped_img, cropped_img, cropped_img))
+        return final_img
+
+
     def __transform_color__(self, image):
         return (image / 127.5) - 1
 
@@ -62,7 +78,7 @@ class KerasController(controller_interface.ControllerInterface):
         #        else:
         #            data['speed'] = self.default_speed
 
-        image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(data['image']), 2)]), dtype=tf.float32)
+        image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(self.segmentation(data['image'])), 2)]), dtype=tf.float32)
         speed = tf.convert_to_tensor(np.array([np.array([data['speed']])]), dtype=tf.float32)
 
         result = self.model.call((image, speed))[0]
