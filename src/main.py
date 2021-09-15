@@ -15,7 +15,7 @@ from tensorforce.execution import Runner
 
 environment = Environment.create(environment='MyEnvironment', max_episode_timesteps=400)
 
-agent = Agent.create(agent='ppo', environment=environment, batch_size=2, learning_rate=0.05)
+agent = Agent.create(agent='ppo', environment=environment, network='auto', batch_size=2, learning_rate=0.05)
 
 runner = Runner( agent=agent, environment=environment, max_episode_timesteps=400)
 
