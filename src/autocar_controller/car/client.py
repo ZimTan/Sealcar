@@ -246,9 +246,9 @@ class SimClient(SDClient):
         while True:
             if len(self.queue_msg_recv) > 0:
                 msg = self.queue_msg_recv.pop()
-                if 'image' in msg.keys():
+                if msg['msg_type'] == 'telemetry':
                     msg['image'] = np.asarray(Image.open(BytesIO(base64.b64decode(msg['image']))))
-                return msg
+                    return msg
             time.sleep(0.01)
 
     def is_connected(self):
