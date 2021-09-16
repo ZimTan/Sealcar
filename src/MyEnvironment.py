@@ -15,6 +15,12 @@ class CustomEnvironment(Environment):
         CAR = client.UnitySimulationClient
         self.car = CAR(autocar_config.car_config)
 
+        data = self.car.get_data()
+
+        self.start_z = data['pos_z']
+        self.pos_z = 0
+        self.count = 0
+
         super().__init__()
 
     def reset(self):
@@ -22,26 +28,16 @@ class CustomEnvironment(Environment):
         CAR = client.UnitySimulationClient
         self.car = CAR(autocar_config.car_config)
 
-        state = np.zeros(shape=(160 * 120,)).astype(int)
-        self.node = 0
-        self.old_node = 0
+        data = self.car.get_data()
+        self.start_z = data['pos_z']
+        print("START ", self.start_z)
+        self.count = 0
+        self.pos_z = 0
+
         self.episode_end = False
         self.finished = False
-        self.change = False
-        self.start_node = 0
-        self.count = 0
-        self.count_of_count = 0
-
-        time.sleep(1)
             
-        data = self.car.get_data()
-
-        if 'activeNode' in data:
-            self.node = data['activeNode']
-
-        self.start_node = self.node
-
-        return state
+        return self.pos_z
 
     def close(self):
         self.car.stop()
@@ -49,12 +45,12 @@ class CustomEnvironment(Environment):
 
 
     def states(self):
-        return dict(type="int", shape=(160*120,), num_values=19200)
+        return dict(type="float")
 
     def actions(self):
         return {
-            'steer': dict(type="int", num_values=20),
-            #'throttle': dict(type="int", num_values=20)
+            #'steer': dict(type="int", num_values=20),
+            'throttle': dict(type="int", num_values=21)
         }
 
     def max_episode_timesteps(self):
@@ -62,16 +58,9 @@ class CustomEnvironment(Environment):
 
     def terminal(self):
 
-        if self.node - self.start_node >= 15 :
-            self.finished = True
-            print("SUCEEEEEEEED !!!!!!!!!")
-
-        #if self.node < self.old_node + 1 or self.old_node - self.node > 3:
-        if self.count >= 20 or self.count_of_count >= 4:
-            self.episode_end = True
-            self.car.stop()
-            print("Failed...")
-
+        self.finished = self.pos_z > 10
+        if self.finished :
+            print("FINISHHHHHH ! ")
 
         return self.finished or self.episode_end
 
@@ -79,51 +68,29 @@ class CustomEnvironment(Environment):
     def reward(self):
 
         if self.finished:
-            reward = 500000 #self.node - self.start_node #plus c'est long rapidement mieux c'est
+            reward =  np.log(((300000 - self.count) ** 2)) #self.node - self.start_node #plus c'est long rapidement mieux c'est
             print(reward)
-        elif self.change:
-            if self.node < self.old_node and self.count_of_count > 5:
-                reward = -1000
-            else:
-                reward = -1#(self.node - self.start_node) * 10
-            self.change = False
         else:
             reward = -1
 
-        reward = self.count * -1
-
-        print("reward : ", reward, " counter : ", self.count, " counter of counter ", self.count_of_count)
         return reward
 
     def compute_actions(self, actions):
 
-        time.sleep(0.2)
         action = np.array([0, 0.0])
-        action[0] = (actions["steer"] - 10) / 10    
-        action[1] = 0.5#(actions["throttle"]) / 20  
+        action[0] = 0 #(actions["steer"] - 10) / 10    
+        action[1] = (actions["throttle"] - 10) / 10  
         self.car.send_action(action)
 
         self.count += 1
 
         data = self.car.get_data()
+        if 'pos_z' in data:
+            self.pos_z = data['pos_z'] - self.start_z
 
-        if 'activeNode' in data:
-            node = data['activeNode']
-        else:
-            node = self.node
+        print(self.pos_z)
 
-        if node != self.node:
-            self.count = 0
-            self.count_of_count += 1
-            self.change = True
-            self.old_node = self.node
-            self.node = node
-        else:
-            self.count_of_count = 0
-
-        if 'image' in data:
-            self.image = data['image'][:,:,0].flatten()
-        return self.image
+        return self.pos_z
 
 
     def execute(self, actions):
