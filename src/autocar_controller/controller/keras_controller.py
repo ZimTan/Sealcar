@@ -78,7 +78,11 @@ class KerasController(controller_interface.ControllerInterface):
         #        else:
         #            data['speed'] = self.default_speed
 
-        image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(self.segmentation(data['image'])), 2)]), dtype=tf.float32)
+        #whitout seg
+       # image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(data['image']), 2)]), dtype=tf.float32)
+
+        image = tf.convert_to_tensor(np.array([np.expand_dims(self.segmentation(self.__transform_grayscale__(data['image'])), 2)]), dtype=tf.float32)
+
         speed = tf.convert_to_tensor(np.array([np.array([data['speed']])]), dtype=tf.float32)
 
         result = self.model.call((image, speed))[0]
