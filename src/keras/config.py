@@ -7,11 +7,11 @@ DATASET = [
 
 # TRAINING PARAMETERS:
 BATCH_SIZE = 128
-EPOCH = 10
+EPOCH = 15
 SHUFFLE = True
 
 # MODEL TYPE:
-MODEL_TYPE = 'nvidia_speed'
+MODEL_TYPE = 'squeezenet' # 'nvidia_speed'
 
 # HYPERPARAMETERS:
 LOSS = 'mse'
