@@ -6,6 +6,7 @@ import shutil
 import argparser_training
 import keras_callbacks
 import datetime
+import numpy as np
 
 import tensorflow as tf
 from tensorflow import keras
@@ -16,7 +17,7 @@ if __name__ == '__main__':
     # Retrieve the model path and setup the corresponding config file
     args = argparser_training.argparser()
     config_file = os.path.join(args.path, 'config.py')
-    model_file = os.path.join(args.path, 'model.h5')
+    model_file = os.path.join(args.path, 'saved_model.pb')
     model_folder = args.path
     log_file = os.path.join(args.path, 'training_log.csv')
 
@@ -29,19 +30,6 @@ if __name__ == '__main__':
 
     # If the model already exists, we load its config file
     # Else we copy the current config file
-    if os.path.isfile(config_file) and not args.create:
-        sys.path.insert(0, args.path)
-        model_loaded = True
-        print("Model Loaded")
-
-    else:
-        shutil.rmtree(args.path, ignore_errors=True)
-
-        os.makedirs(args.path, exist_ok=True)
-        shutil.copyfile('config.py', config_file)
-
-        model_loaded = False
-        print("Model Created")
 
     import config
 
@@ -50,23 +38,28 @@ if __name__ == '__main__':
     model_name = "".join(list(map(lambda n : n[0].upper() + n[1:], config.MODEL_TYPE.split("_")))) + "Model"
     model_class = getattr(model_module, model_name)
 
-    model = (keras.models.load_model(model_file) if model_loaded else model_class(config.IMAGE_DIMENSION, 2))
+    print(model_file)
 
-    model.compile(loss=config.LOSS, optimizer=tf.keras.optimizers.Adam(lr=config.LEARNING_RATE))
-
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-
-    callbacks = [
-            keras_callbacks.ModelCheckpointTFFormat(path=model_folder),
-            keras.callbacks.CSVLogger(log_file, separator=",", append=True),
-            tensorboard_callback
-        ]
     if (config.MODEL_TYPE != 'autoencoder'):
         data = loader.DataGenerator(config.DATASET, (config.IMAGE_DIMENSION[0],
                                                      config.IMAGE_DIMENSION[1]), config.IMAGE_DIMENSION[2], config.BATCH_SIZE, config.GRAYSCALE)
-    else:
-        data = loader.DataGenerator(config.DATASET, (config.IMAGE_DIMENSION[0],
-                                                     config.IMAGE_DIMENSION[1]), config.IMAGE_DIMENSION[2], config.BATCH_SIZE, config.GRAYSCALE, autoencoder=True)
 
-    history = model.fit(data, epochs=config.EPOCH, shuffle=config.SHUFFLE, workers=4, use_multiprocessing=args.thread, verbose=1, callbacks=callbacks)
+    model = (keras.models.load_model(args.path))
+
+    image = np.load("../../dataset/rrl1/image_114-28-251996.npy")
+    image = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140])
+    image = (image / 127.5) - 1
+    image = np.expand_dims(image, axis=-1)
+    image = np.expand_dims(image, axis=0)
+
+    import cv2
+    print(image.shape)
+    image = image * 127.5 + 1
+    print("icicicicici")
+    cv2.imwrite('test2.jpg', image.reshape((image.shape[1], image.shape[2])))
+
+    res = model.predict(image)
+    res = (res * 127.5) + 1
+    res = res.reshape((res.shape[1], res.shape[2]))
+
+   # cv2.imwrite('test.jpg', res)

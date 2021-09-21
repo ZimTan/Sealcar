@@ -2,16 +2,16 @@
 
 # DATASET:
 DATASET = [
-    '../../dataset/fragmented_rrl1',
+    '../../dataset/rrl1',
     ]
 
 # TRAINING PARAMETERS:
-BATCH_SIZE = 128
-EPOCH = 15
+BATCH_SIZE = 18
+EPOCH = 35
 SHUFFLE = True
 
 # MODEL TYPE:
-MODEL_TYPE = 'squeezenet' # 'nvidia_speed'
+MODEL_TYPE = 'autoencoder' # 'nvidia_speed'
 
 # HYPERPARAMETERS:
 LOSS = 'mse'

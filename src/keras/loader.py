@@ -11,12 +11,13 @@ from json import load as jsonload
 import preprocessing_functions
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, directories, dim, n_channels, batch_size=32, grayscale=False):
+    def __init__(self, directories, dim, n_channels, batch_size=32, grayscale=False, autoencoder=False):
         self.directories = directories
         self.dim = dim
         self.n_channels = n_channels
         self.batch_size = batch_size
         self.grayscale = grayscale
+        self.autoencoder = autoencoder
 
         if self.grayscale:
             self.n_channels = 1
@@ -76,6 +77,10 @@ class DataGenerator(keras.utils.Sequence):
 
         args_batch.append(image_batch)
         args_batch.append(speed_batch)
+
+        if self.autoencoder == True:
+            return image_batch, image_batch
+
         return args_batch, label_batch
 
     def on_epoch_end(self):
