@@ -23,7 +23,7 @@ for img in imgs:
     hls_img = cv2.cvtColor(np_img, cv2.COLOR_BGR2HLS)
     lum_img = hls_img[:,:,1]
 
-    frag_img = cv2.inRange(lum_img, 215, 255)
+    frag_img = cv2.inRange(lum_img, 210, 255)
 
     cropped_img = frag_img
     cropped_img[:50,:] = 0

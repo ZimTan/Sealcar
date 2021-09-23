@@ -1,9 +1,10 @@
 import tensorflow as tf
 
-class NvidiaSpeedModel(tf.keras.Model):
+class NvidiaSpeedLstmModel(tf.keras.Model):
 
   def __init__(self, input_shape, num_outputs):
-    super(NvidiaSpeedModel, self).__init__()
+    super(NvidiaSpeedLstmModel, self).__init__()
+
     self.conv1 = tf.keras.layers.Conv2D(filters=24, kernel_size=(5, 5), strides=(2, 2),
             activation='relu', padding='same',
             kernel_initializer=tf.keras.initializers.he_uniform())
@@ -31,6 +32,15 @@ class NvidiaSpeedModel(tf.keras.Model):
 
     self.dense3 = tf.keras.layers.Dense(128, activation='tanh')
 
+    self.lstm1 = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(128, return_sequences=True,
+            kernel_initializer=tf.keras.initializers.he_uniform()))
+
+    self.lstm2 = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(128,
+            kernel_initializer=tf.keras.initializers.he_uniform()))
+
+    self.dropout3 =tf.keras.layers.Dropout(.2)
+    self.dropout4 =tf.keras.layers.Dropout(.2)
+
     self.outputs = tf.keras.layers.Dense(num_outputs)
 
   def call(self, inputs, training=False):
@@ -50,4 +60,14 @@ class NvidiaSpeedModel(tf.keras.Model):
     x = self.dense2(x)
     x = self.dense3(x)
 
-    return self.outputs(x)
+    x = self.outputs(x)
+
+    x = self.lstm1(tf.keras.layers.TimeDistributed(x))
+    if training:
+        x = self.dropout3(x)
+
+    x = self.lstm2(x)
+    if training:
+        x = self.dropout4(x)
+
+    return x
