@@ -53,6 +53,10 @@ elif args.mode == 'xbox':
     import autocar_controller.controller.xbox_controller as xbox_controller
     CONTROLLER = xbox_controller.XboxController
 
+elif args.mode == 'pytorch':
+    import autocar_controller.controller.pytorch_controller as pytorch_controller
+    CONTROLLER = pytorch_controller.PytorchController
+
 CAR = client.UnitySimulationClient
 VIEWER = viewer_lib.OpenCvViewer
 RECORDER = opencv_recorder.OpenCvRecorder

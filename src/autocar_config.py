@@ -4,7 +4,7 @@
 controller_config = {
     'dead_zone': 0.15,
     'fix_steer': 0.0,
-    'path': 'src/keras/trained_model'
+    'path': 'src/pytorch/models'
 }
 
 # viewer config:

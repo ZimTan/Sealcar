@@ -162,3 +162,5 @@ if __name__ == '__main__':
 
     mse = nn.MSELoss()
     print(eval_model(net, val_loader, mse))
+
+    torch.save(net.state_dict(), "models/nvidia_speed")
