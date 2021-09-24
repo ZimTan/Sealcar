@@ -49,6 +49,7 @@ def eval_model(net, loader, loss_fn):
             # No need to compute gradient here thus we avoid storing intermediary activations
             logits = net(x.to(device)).cpu()
 
+        print(logits)
         loss += loss_fn(logits, y).item()
         preds = logits.argmax(dim=1)
         #acc += (preds.numpy() == y.numpy()).sum()

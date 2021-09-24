@@ -47,6 +47,7 @@ class MyDataSet(Dataset):
             image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
 
         image = np.load(image_name)
+        print(image.shape)
 
         if self.transform:
             image = self.transform(image)

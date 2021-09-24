@@ -8,6 +8,7 @@ import config as conf
 
 import torch
 import torchvision
+from torchvision import transforms
 import pytorch.nvidia_speed as nvidia_speed
 
 from pynput import keyboard
@@ -27,6 +28,10 @@ class PytorchController(controller_interface.ControllerInterface):
 
         self.listener = keyboard.Listener(on_press=self._on_press)
         self.listener.start()
+
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+        ])
 
         self.KEYBOARD_ESC = False
 
@@ -80,18 +85,7 @@ class PytorchController(controller_interface.ControllerInterface):
         #        else:
         #            data['speed'] = self.default_speed
 
-        #whitout seg
-       # image = tf.convert_to_tensor(np.array([np.expand_dims(self.__transform_grayscale__(data['image']), 2)]), dtype=tf.float32)
-
-        #image = torch.tensor(np.array([np.expand_dims(self.segmentation(self.__transform_grayscale__(data['image'])), 2)]), dtype=tf.float32)
-
-        image = torch.tensor(np.swapaxes(np.swapaxes(data['image'], 0, 2), 1, 2)).float()
-        print(image.shape)
-        #image = torchvision.transforms.functional.to_tensor(np.expand_dims(np.swapaxes(data['image'], 0, 2), 0))
-
-        #speed = tf.convert_to_tensor(np.array([np.array([data['speed']])]), dtype=tf.float32)
-
-        #result = self.model.call((image, speed))[0]
+        image = self.transform(data['image'])
 
         result = self.model(image[None, ...])[0]
         print("Result : ", result) 
