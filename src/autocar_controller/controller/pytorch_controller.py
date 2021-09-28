@@ -85,7 +85,8 @@ class PytorchController(controller_interface.ControllerInterface):
         #        else:
         #            data['speed'] = self.default_speed
 
-        image = self.transform(data['image'])
+        image = self.segmentation(data['image'])
+        image = self.transform(image)
 
         result = self.model(image[None, ...])[0]
         print("Result : ", result) 

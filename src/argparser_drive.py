@@ -7,7 +7,7 @@ def argparser():
     # We create a choice argument (because we want either xbox, keras or 
     # keyboard but not at the same time)
     parser.add_argument('-m', '--mode', required=True,
-            choices=['xbox', 'keras', 'keyboard', 'direction'],
+            choices=['xbox', 'keras', 'keyboard', 'direction', 'pytorch'],
             help='Choose the controller (xbox, keras, keyboard or direction)')
 
     args = parser.parse_args()

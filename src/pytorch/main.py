@@ -17,7 +17,7 @@ device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("
 print("Device use is : ", device)
 
 
-dataset_path = "robotracingleague_dataset/rrl1"
+dataset_path = ["robotracingleague_dataset/fragmented_rrl1/", "dataset/fragmented_rrl1/"]
 
 """
 
@@ -49,7 +49,6 @@ def eval_model(net, loader, loss_fn):
             # No need to compute gradient here thus we avoid storing intermediary activations
             logits = net(x.to(device)).cpu()
 
-        print(logits)
         loss += loss_fn(logits, y).item()
         preds = logits.argmax(dim=1)
         #acc += (preds.numpy() == y.numpy()).sum()
@@ -120,16 +119,20 @@ if __name__ == '__main__':
 
     #create transforms
     train_transforms = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Grayscale(),
         transforms.ToTensor(),
         #transforms.Normalize(mean, std),
     ])
 
     test_transforms = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Grayscale(),
         transforms.ToTensor(),
         #transforms.Normalize(mean, std),
     ])
 
-    train_dataset = MyDataSet([dataset_path], transform=train_transforms) 
+    train_dataset = MyDataSet(dataset_path, transform=train_transforms) 
 
     train_dataset, val_dataset = torch.utils.data.random_split(
         train_dataset,
@@ -137,13 +140,13 @@ if __name__ == '__main__':
     )
 
     val_dataset.transform = test_transforms
-    test_dataset = MyDataSet([dataset_path], transform=test_transforms, train=False) 
+    test_dataset = MyDataSet(dataset_path, transform=test_transforms, train=False) 
 
     print(f"Nb images in train: {len(train_dataset)}")
     print(f"Nb images in val: {len(val_dataset)}")
     print(f"Nb images in test: {len(test_dataset)}")
 
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=128, num_workers=8)
     test_loader = DataLoader(test_dataset, batch_size=128, num_workers=8)
 
@@ -157,9 +160,9 @@ if __name__ == '__main__':
 
     #test_model_random(net, (2, 3, 120, 160))
 
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.1)#, momentum=0.9, nesterov=True)
+    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)#, momentum=0.9, nesterov=True)
 
-    train_model(net, train_loader, val_loader, 30, optimizer)
+    train_model(net, train_loader, val_loader, 9, optimizer)
 
     mse = nn.MSELoss()
     print(eval_model(net, val_loader, mse))
