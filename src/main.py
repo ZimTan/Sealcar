@@ -14,7 +14,7 @@ RECORDER = opencv_recorder.OpenCvRecorder
 # Set up car:
 car = CAR(autocar_config.car_config)
 recorder = RECORDER(autocar_config.recorder_config)
-recorder.capture_on = True;
+#recorder.capture_on = True;
 
 # Start driving:
 action = numpy.array([0, 0.0])

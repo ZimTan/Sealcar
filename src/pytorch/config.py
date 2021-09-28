@@ -2,8 +2,8 @@
 
 IMAGE_DIM = (120, 160, 1)
 
-DATASET_PATH = "dataset/fragmented_rrl1/"
-MODEL_SAVE_PATH = "trained_models/nvidia-speed/"
+DATASETS_PATH = ["dataset/fragmented_rrl1/"]
+MODEL_SAVE_PATH = "models/nvidia-speed"
 
 TRAIN_SIZE = 0.7
 VALID_SIZE = 0.2

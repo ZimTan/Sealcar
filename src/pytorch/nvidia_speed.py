@@ -18,16 +18,16 @@ class NvidiaSpeed(nn.Module):
         )
 
         self.linear1 = nn.Linear(64*9*12, 512)
-        self.linear2 = nn.Linear(512, 256) 
-        self.linear3 = nn.Linear(256, 128) 
-        self.linear4 = nn.Linear(128, 2) 
+        self.linear2 = nn.Linear(512, 256)
+        self.linear3 = nn.Linear(256, 128)
+        self.linear4 = nn.Linear(128, 2)
 
         self.dropout1 = nn.Dropout(p=0.2)
         self.dropout2 = nn.Dropout(p=0.5)
 
         self.act = nn.ReLU(inplace=True)
         self.act2 = nn.Tanh()
-        
+
 
     def forward(self, x):
 

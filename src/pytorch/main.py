@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 
 import nvidia_speed
 import loader
+import config
 from loader import MyDataSet
 from nvidia_speed import NvidiaSpeed
 
@@ -17,7 +18,7 @@ device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("
 print("Device use is : ", device)
 
 
-dataset_path = ["robotracingleague_dataset/fragmented_rrl1/", "dataset/fragmented_rrl1/"]
+dataset_path = config.DATASETS_PATH
 
 """
 
@@ -136,7 +137,7 @@ if __name__ == '__main__':
 
     train_dataset, val_dataset = torch.utils.data.random_split(
         train_dataset,
-        [int(0.8 * len(train_dataset)), int(0.2 * len(train_dataset) + 1)]
+        [int(config.TRAIN_SIZE * len(train_dataset)), len(train_dataset) - int(config.TRAIN_SIZE * len(train_dataset))]
     )
 
     val_dataset.transform = test_transforms
@@ -146,9 +147,9 @@ if __name__ == '__main__':
     print(f"Nb images in val: {len(val_dataset)}")
     print(f"Nb images in test: {len(test_dataset)}")
 
-    train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
-    val_loader = DataLoader(val_dataset, batch_size=128, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=128, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
+    val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
+    test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
 
     print(f"\nNb batches in train: {len(train_loader)}")
     print(f"Nb batches in val: {len(val_loader)}")
@@ -160,11 +161,11 @@ if __name__ == '__main__':
 
     #test_model_random(net, (2, 3, 120, 160))
 
-    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)#, momentum=0.9, nesterov=True)
+    optimizer = torch.optim.Adam(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
 
-    train_model(net, train_loader, val_loader, 9, optimizer)
+    train_model(net, train_loader, val_loader, config.EPOCH, optimizer)
 
     mse = nn.MSELoss()
     print(eval_model(net, val_loader, mse))
 
-    torch.save(net.state_dict(), "models/nvidia_speed")
+    torch.save(net.state_dict(), config.MODEL_SAVE_PATH)
