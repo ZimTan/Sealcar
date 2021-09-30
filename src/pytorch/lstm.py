@@ -1,50 +1,32 @@
 import torch
 from torch import nn
+from torchvision.models import squeezenet1_1
+
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
 
 class LSTM(nn.Module):
 
-    def __init__(self, input_dim, hidden_dim, layer_dim, output_dim):
+    def __init__(self):
         super(LSTM, self).__init__()
 
-        self.hidden_dim = hidden_dim # Hidden dimensions
-        self.layer_dim = layer_dim # Number of hidden layers
+        # (w - k + 2p) / s + 1
+        self.cnn = squeezenet1_1()
+        self.cnn.features[0] = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(2, 2))
+        self.cnn.classifier[1] = nn.Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
 
+        self.fc1 = nn.Linear(256, 128)
+        self.fc2 = nn.Linear(128, 2)
 
-        # RNN LSTM model building:
-        # ouput size formula: (w - k + 2p) / s + 1
-        self.lstm = nn.Sequential(
-                    nn.LSTM(input_dim, hidden_dim, layer_dim, batch_first=True),
-                    nn.Dropout(0.2),
-                )
-
-        self.dense1 = nn.Linear(hidden_dim, output_dim)
-
-        self.act = nn.ReLU(inplace=True)
+        self.act1 = nn.ReLU(inplace=True)
 
 
     def forward(self, x):
 
-        # Initialize hidden state with zeros
-        h0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_()
+        x = self.cnn(x)
 
-        # Initialize cell state
-        c0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_()
+        x = self.fc1(x)
+        x = self.act1(x)
+        x = self.fc2(x)
 
-        # 28 time steps
-        # We need to detach as we are doing truncated backpropagation through time (BPTT)
-        # If we don't, we'll backprop all the way to the start even after going through another batch
-
-        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
-
-        # Index hidden state of last time step
-        # out.size() --> 100, 28, 100
-        # out[:, -1, :] --> 100, 100 --> just want last time step hidden states! 
-        out = self.fc(out[:, -1, :]) 
-        # out.size() --> 100, 10
-
-        return out
-
-
-
-
+        return x

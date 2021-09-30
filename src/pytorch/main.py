@@ -76,9 +76,6 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
         c = 0
         for x, y in train_loader:
 
-            if (config.MODEL_NAME == 'lstm'):
-                x = x.view(-1, 120, 160).requires_grad_()
-
             x, y = x.to(device), y.to(device)
 
             optimizer.zero_grad()  # Clear previous gradients
@@ -164,7 +161,7 @@ if __name__ == '__main__':
     if (config.MODEL_NAME == "nvidia-speed"):
         net = NvidiaSpeed()
     elif (config.MODEL_NAME == "lstm"):
-        net = LSTM(28, 128, 2, 2)
+        net = LSTM()
     else:
         print(f"Error: unrecognize model name in configuration: {config.MODEL_NAME}")
         exit(1)

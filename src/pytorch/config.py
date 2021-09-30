@@ -18,7 +18,7 @@ BATCH_SIZE = 128
 
 LEARNING_RATE = 1e-3
 
-LOSS_FUNC = 'cross-entropy'
+LOSS_FUNC = 'mse'
 # available loss function are: mse, cross-entropy
 
 OPTIMIZER = 'adam'

@@ -10,6 +10,7 @@ import torch
 import torchvision
 from torchvision import transforms
 import pytorch.nvidia_speed as nvidia_speed
+import pytorch.lstm as lstm
 
 from pynput import keyboard
 from pynput.keyboard import Key
@@ -45,8 +46,9 @@ class PytorchController(controller_interface.ControllerInterface):
         if not os.path.isdir(path):
             sys.exit(path + ': No such file or directory')
 
-        self.model = nvidia_speed.NvidiaSpeed()
-        self.model.load_state_dict(torch.load(path + "/nvidia_speed"))
+        #self.model = nvidia_speed.NvidiaSpeed()
+        self.model = lstm.LSTM()
+        self.model.load_state_dict(torch.load(path + "/" + conf.MODEL_TYPE))
         self.model.eval()
 
     def _on_press(self, key):
@@ -67,8 +69,8 @@ class PytorchController(controller_interface.ControllerInterface):
         cropped_img = frag_img
         cropped_img[:50,:] = 0
 
-        final_img = cv2.merge((cropped_img, cropped_img, cropped_img))
-        return final_img
+        #final_img = cv2.merge((cropped_img, cropped_img, cropped_img))
+        return cropped_img
 
 
     def __transform_color__(self, image):
