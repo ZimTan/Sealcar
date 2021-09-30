@@ -6,8 +6,8 @@
 DATASET = [
     '../../dataset/data_analisys',
     ]
-BATCH_SIZE = 32
-EPOCH = 10
+BATCH_SIZE = 128
+EPOCH = 20
 
 # MODEL TYPE
 MODEL_TYPE = 'nvidia-speed'

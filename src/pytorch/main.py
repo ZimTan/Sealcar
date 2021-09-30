@@ -12,6 +12,7 @@ import loader
 import config
 from loader import MyDataSet
 from nvidia_speed import NvidiaSpeed
+from lstm import LSTM
 
 #Use GPU cuda if possible
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
@@ -74,6 +75,10 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
         running_acc, running_loss = 0., 0.
         c = 0
         for x, y in train_loader:
+
+            if (config.MODEL_NAME == 'lstm'):
+                x = x.view(-1, 120, 160).requires_grad_()
+
             x, y = x.to(device), y.to(device)
 
             optimizer.zero_grad()  # Clear previous gradients
@@ -155,7 +160,14 @@ if __name__ == '__main__':
     print(f"Nb batches in val: {len(val_loader)}")
     print(f"Nb batches in test: {len(test_loader)}")
 
-    net = NvidiaSpeed()
+
+    if (config.MODEL_NAME == "nvidia-speed"):
+        net = NvidiaSpeed()
+    elif (config.MODEL_NAME == "lstm"):
+        net = LSTM(28, 128, 2, 2)
+    else:
+        print(f"Error: unrecognize model name in configuration: {config.MODEL_NAME}")
+        exit(1)
 
     net.to(device)
 
@@ -165,7 +177,16 @@ if __name__ == '__main__':
 
     train_model(net, train_loader, val_loader, config.EPOCH, optimizer)
 
-    mse = nn.MSELoss()
-    print(eval_model(net, val_loader, mse))
+    if (config.LOSS_FUNC == "mse"):
+        loss = nn.MSELoss()
+    elif (config.LOSS_FUNC == "cross-entropy"):
+        loss = nn.CrossEntropyLoss()
+
+    else:
+        print(f"Error: unrecognize loss function in configuration: {config.LOSS_FUNC}")
+        exit(1)
+
+
+    print(eval_model(net, val_loader, loss))
 
     torch.save(net.state_dict(), config.MODEL_SAVE_PATH)
