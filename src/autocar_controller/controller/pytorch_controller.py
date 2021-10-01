@@ -11,6 +11,7 @@ import torchvision
 from torchvision import transforms
 import pytorch.nvidia_speed as nvidia_speed
 import pytorch.lstm as lstm
+import pytorch.config as torch_config
 
 from pynput import keyboard
 from pynput.keyboard import Key
@@ -46,8 +47,12 @@ class PytorchController(controller_interface.ControllerInterface):
         if not os.path.isdir(path):
             sys.exit(path + ': No such file or directory')
 
-        #self.model = nvidia_speed.NvidiaSpeed()
-        self.model = lstm.LSTM()
+
+        if (torch_config.MODEL_NAME == "nvidia-speed"):
+            self.model = nvidia_speed.NvidiaSpeed()
+        elif (torch_config.MODEL_NAME == "lstm"):
+            self.model = lstm.LSTM()
+
         self.model.load_state_dict(torch.load(path + "/" + conf.MODEL_TYPE))
         self.model.eval()
 
@@ -89,6 +94,10 @@ class PytorchController(controller_interface.ControllerInterface):
 
         image = self.segmentation(data['image'])
         image = self.transform(image)
+
+        if (torch_config.MODEL_NAME == "lstm"):
+            image = np.expand_dims(image, axis=1)
+            image = torch.FloatTensor(image)
 
         result = self.model(image[None, ...])[0]
         print("Result : ", result) 

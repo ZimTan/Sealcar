@@ -9,16 +9,18 @@ TRAIN_SIZE = 0.7
 VALID_SIZE = 0.2
 TEST_SIZE = 0.1
 
+SHUFFLE_DATA = False
+
 MODEL_NAME = "lstm"
 # available model are: nvidia-speed, lstm
 
-EPOCH = 15
+EPOCH = 10
 
 BATCH_SIZE = 128
 
 LEARNING_RATE = 1e-3
 
-LOSS_FUNC = 'mse'
+LOSS_FUNC = 'cross-entropy'
 # available loss function are: mse, cross-entropy
 
 OPTIMIZER = 'adam'

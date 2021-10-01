@@ -2,6 +2,7 @@ import torch
 import time
 import matplotlib.pyplot as plt
 
+import numpy as np
 from torch import nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -47,11 +48,20 @@ def eval_model(net, loader, loss_fn):
     for x, y in loader:
         #x, y = x.to(device), y.to(device)
 
+
+        if (config.MODEL_NAME == "lstm"):
+            x = np.expand_dims(x, axis=1)
+            x = torch.FloatTensor(x)
+
         with torch.no_grad():
             # No need to compute gradient here thus we avoid storing intermediary activations
             logits = net(x.to(device)).cpu()
 
-        loss += loss_fn(logits, y).item()
+        if (config.LOSS_FUNC == "cross-entropy"):
+            loss += loss_fn(logits, torch.max(y, 1)[1]).item()
+        else:
+            loss += loss_fn(logits, y).item()
+
         preds = logits.argmax(dim=1)
         #acc += (preds.numpy() == y.numpy()).sum()
         c += len(x)
@@ -67,8 +77,12 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
     train_accs, train_losses = [], []
     val_accs, val_losses = [], []
 
-    #cross_entropy = nn.CrossEntropyLoss() #Does softmax + CE
-    mse = nn.MSELoss()
+
+    if (config.LOSS_FUNC == "mse"):
+        loss_fn = nn.MSELoss()
+    elif (config.LOSS_FUNC == "cross-entropy"):
+        loss_fn = nn.CrossEntropyLoss() #Does softmax + CE
+
 
     for epoch in range(nb_epochs):
         start = time.time()
@@ -76,11 +90,22 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
         c = 0
         for x, y in train_loader:
 
-            x, y = x.to(device), y.to(device)
+            if (config.MODEL_NAME == "lstm"):
+                x = np.expand_dims(x, axis=1)
+                x = torch.FloatTensor(x)
+
+            x = x.to(device)
+            if (config.LOSS_FUNC == "cross-entropy"):
+                y = y.to(device, dtype=torch.long)
+            else:
+                y = y.to(device)
 
             optimizer.zero_grad()  # Clear previous gradients
             logits = net(x)
-            loss = mse(logits, y)
+            if (config.LOSS_FUNC == "cross-entropy"):
+                loss = loss_fn(logits, torch.max(y, 1)[1])  
+            else:
+                loss = loss_fn(logits, y)
             loss.backward()  # Compute gradients
             optimizer.step()  # Update weights with gradients
 
@@ -93,7 +118,7 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
         train_accs.append(train_acc)
         train_losses.append(train_loss)
 
-        val_acc, val_loss = eval_model(net, val_loader, mse)
+        val_acc, val_loss = eval_model(net, val_loader, loss_fn)
         val_accs.append(val_acc)
         val_losses.append(val_loss)
 
@@ -149,7 +174,7 @@ if __name__ == '__main__':
     print(f"Nb images in val: {len(val_dataset)}")
     print(f"Nb images in test: {len(test_dataset)}")
 
-    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=config.SHUFFLE_DATA, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
     test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
 
