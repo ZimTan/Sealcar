@@ -88,11 +88,14 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
         start = time.time()
         running_acc, running_loss = 0., 0.
         c = 0
+
         for x, y in train_loader:
 
             if (config.MODEL_NAME == "lstm"):
-                x = np.expand_dims(x, axis=1)
-                x = torch.FloatTensor(x)
+
+                #x = np.expand_dims(x, axis=1)
+                #x = torch.FloatTensor(x)
+                x = x.reshape((16, 8, config.IMAGE_DIM[2], config.IMAGE_DIM[0], config.IMAGE_DIM[1]))
 
             x = x.to(device)
             if (config.LOSS_FUNC == "cross-entropy"):
@@ -103,6 +106,9 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
             optimizer.zero_grad()  # Clear previous gradients
             logits = net(x)
             if (config.LOSS_FUNC == "cross-entropy"):
+                indices = torch.Tensor([16 * i - 1 for i in range(1, (config.BATCH_SIZE // 16) + 1)]).long()
+                y = torch.index_select(y, 0, indices)
+                print(y.shape)
                 loss = loss_fn(logits, torch.max(y, 1)[1])  
             else:
                 loss = loss_fn(logits, y)
