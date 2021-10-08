@@ -8,10 +8,12 @@ from torch.utils.data import DataLoader
 
 
 import nvidia_speed
+import cnn_segmentation
 import loader
 import config
 from loader import MyDataSet
 from nvidia_speed import NvidiaSpeed
+from cnn_segmentation import CNNSeg
 
 #Use GPU cuda if possible
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
@@ -39,16 +41,31 @@ def test_model_random(net, input_shape):
     give accuraty and loss
 
 """
-def eval_model(net, loader, loss_fn):
+def eval_model(net, loader, loss_fn, show=False):
     net.eval()
     acc, loss = 0., 0.
     c = 0
+
+    if show:
+        for y, x in loader:
+            print(type(x))
+
+            with torch.no_grad():
+                logits = net(x.to(device)).cpu()
+
+            f, ax = plt.subplots(2)
+            ax[0].imshow(x[0].squeeze(dim=0), cmap='gray')
+            ax[1].imshow(logits[0].squeeze(dim=0), cmap='gray')
+            plt.show()
+        return 0, 0;
+
     for x, y in loader:
         #x, y = x.to(device), y.to(device)
 
         with torch.no_grad():
             # No need to compute gradient here thus we avoid storing intermediary activations
             logits = net(x.to(device)).cpu()
+
 
         loss += loss_fn(logits, y).item()
         preds = logits.argmax(dim=1)
@@ -141,7 +158,8 @@ if __name__ == '__main__':
     )
 
     val_dataset.transform = test_transforms
-    test_dataset = MyDataSet(dataset_path, transform=test_transforms, train=False) 
+    path_data_rrl1 = ["first_lap_datasets/big_dataset/rrl1/", "first_lap_datasets/scared_dataset/rrl1/"]
+    test_dataset = MyDataSet(path_data_rrl1, transform=train_transforms, train=True) 
 
     print(f"Nb images in train: {len(train_dataset)}")
     print(f"Nb images in val: {len(val_dataset)}")
@@ -149,13 +167,14 @@ if __name__ == '__main__':
 
     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
+    test_loader = DataLoader(test_dataset, batch_size=4, num_workers=0)
 
     print(f"\nNb batches in train: {len(train_loader)}")
     print(f"Nb batches in val: {len(val_loader)}")
     print(f"Nb batches in test: {len(test_loader)}")
 
-    net = NvidiaSpeed()
+    #net = NvidiaSpeed()
+    net = CNNSeg()
 
     net.to(device)
 
@@ -166,6 +185,6 @@ if __name__ == '__main__':
     train_model(net, train_loader, val_loader, config.EPOCH, optimizer)
 
     mse = nn.MSELoss()
-    print(eval_model(net, val_loader, mse))
+    eval_model(net, test_loader, mse, show=True)
 
     torch.save(net.state_dict(), config.MODEL_SAVE_PATH)
