@@ -8,14 +8,16 @@ class CNNSeg(nn.Module):
 
         # (w - k + 2p) / s + 1
         self.conv_seg = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=5, padding=2, stride=1), #3x120x160
+            nn.Conv2d(1, 16, kernel_size=5, padding=2), #3x120x160
             nn.ReLU(inplace=True),
-            nn.Conv2d(16, 32, kernel_size=5, padding=2, stride=1), #24x60x80
+            nn.MaxPool2d(2,2),
+            nn.Conv2d(16, 32, kernel_size=5, padding=2), #16x60x80
             nn.ReLU(inplace=True),
-            nn.Conv2d(32, 16, kernel_size=3, padding=1, stride=1), #36x30x40
+            nn.MaxPool2d(2,2),
+
+            nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2), #
             nn.ReLU(inplace=True),
-            nn.Conv2d(16, 1, kernel_size=3, padding=1, stride=1), #48x15x20
-            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(16, 1, kernel_size=2, stride=2)
         )
 
         #self.act = nn.ReLU(inplace=True)

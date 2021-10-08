@@ -29,6 +29,7 @@ class SegDataSet(Dataset):
         self.transform = transform
         self.directories = directories
         self.json_ids = []
+        self.json_seg_ids = []
         self.train = train
 
         self.input_transforms = transforms.Compose([
@@ -39,9 +40,9 @@ class SegDataSet(Dataset):
         ])
 
         count = 0
-            
-        for dir in directories:
-            for x in os.listdir(dir):
+
+        for (dir, dir_seg) in directories:
+            for x in os.listdir(dir_seg):
                 if ".json" in x and x != "meta.json":
 
                     count += 1
@@ -51,6 +52,7 @@ class SegDataSet(Dataset):
                         continue
 
                     self.json_ids.append(os.path.join(dir, x))
+                    self.json_seg_ids.append(os.path.join(dir_seg, x))
 
     def __len__(self):
         return len(self.json_ids)
@@ -58,26 +60,35 @@ class SegDataSet(Dataset):
     def __getitem__(self, idx):
 
         json_id = self.json_ids[idx]
+        json_seg_id = self.json_seg_ids[idx]
 
         with open(json_id) as json:
             image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
 
-        image = np.load(image_name)
+        with open(json_seg_id) as json:
+            image_seg_name = '/'.join(json_seg_id.split('/')[:-1]) + '/image_' + json_seg_id.split('/')[-1][5:-5] + '.npy'
 
-        if self.input_transforms:
-            in_image = self.input_transforms(np.copy(image))
+        image = np.load(image_name)
+        image_seg = np.load(image_seg_name)
 
         if self.transform:
             image = self.transform(image)
 
-        """
-        f, ax = plt.subplots(2)
-        ax[0].imshow(in_image.squeeze(dim=0), cmap='gray')
-        ax[1].imshow(image.squeeze(dim=0), cmap='gray')
-        plt.show()
-        """
+        if random.randint(0, 5) == 1:
+            image = self.input_transforms(image_seg.copy())
 
-        sample = (in_image, image)
+        if self.transform:
+            image_seg = self.transform(image_seg)
+
+
+
+       # f, ax = plt.subplots(2)
+       # ax[0].imshow(image_seg.squeeze(dim=0), cmap='gray')
+       # ax[1].imshow(image.squeeze(dim=0), cmap='gray')
+       # plt.show()
+
+
+        sample = (image, image_seg)
 
         return sample
 
@@ -92,7 +103,6 @@ class MyDataSet(Dataset):
         self.train = train
 
         count = 0
-            
         for dir in directories:
             for x in os.listdir(dir):
                 if ".json" in x and x != "meta.json":

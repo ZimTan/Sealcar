@@ -11,7 +11,10 @@ import nvidia_speed
 import cnn_segmentation
 import loader
 import config
+
+from loader import SegDataSet
 from loader import MyDataSet
+
 from nvidia_speed import NvidiaSpeed
 from cnn_segmentation import CNNSeg
 from seg_nvidia import SegNvidia
@@ -48,7 +51,7 @@ def eval_model(net, loader, loss_fn, show=False):
     c = 0
 
     if show:
-        for y, x in loader:
+        for x, y in loader:
             print(type(x))
 
             with torch.no_grad():
@@ -80,7 +83,6 @@ def eval_model(net, loader, loss_fn, show=False):
 
 
 def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
-    
     train_accs, train_losses = [], []
     val_accs, val_losses = [], []
 
@@ -131,6 +133,30 @@ def plot_acc_loss(train_accs, val_accs, train_losses, val_losses, nb_epochs):
     plt.plot(list(range(nb_epochs)), val_losses, label="Val")
     plt.title("Loss")
 
+
+#TODO faire une classe qui claque sa mère
+
+def head_train_model(net, train_loader, val_loader, test_loader, save_path, epoch):
+
+    net.to(device)
+
+    #test_model_random(net, (2, 3, 120, 160))
+
+    optimizer = torch.optim.Adam(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
+   # optimizer = torch.optim.SGD(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
+
+    train_model(net, train_loader, val_loader, epoch, optimizer)
+
+    mse = nn.MSELoss()
+
+    #tkt
+    if epoch < 22:
+        eval_model(net, test_loader, mse, show=True)
+
+    torch.save(net.state_dict(), save_path)
+    return net
+
+
 if __name__ == '__main__':
 
     #create transforms
@@ -141,46 +167,45 @@ if __name__ == '__main__':
         #transforms.Normalize(mean, std),
     ])
 
-    train_dataset = MyDataSet(dataset_path, transform=train_transforms) 
+    train_seg_dataset = SegDataSet(config.DATASETS_SEG_PATH, transform=train_transforms) 
+    train_seg_dataset, val_seg_dataset = torch.utils.data.random_split(
+        train_seg_dataset,
+        [int(config.TRAIN_SIZE * len(train_seg_dataset)), len(train_seg_dataset) - int(config.TRAIN_SIZE * len(train_seg_dataset))]
+    )
+
+    val_seg_dataset.transform = train_transforms
+    test_seg_dataset = SegDataSet(config.DATASETS_SEG_PATH, transform=train_transforms, train=False) 
+
+    print(f"Nb images in train: {len(train_seg_dataset)}")
+    print(f"Nb images in val: {len(val_seg_dataset)}")
+    print(f"Nb images in test: {len(test_seg_dataset)}")
+
+    train_seg_loader = DataLoader(train_seg_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
+    val_seg_loader = DataLoader(val_seg_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
+    test_seg_loader = DataLoader(test_seg_dataset, batch_size=128, num_workers=8)
+
+    conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 20)
+
+    '''
+    print(f"\nNb batches in train: {len(train_seg_loader)}")
+    print(f"Nb batches in val: {len(val_seg_loader)}")
+    print(f"Nb batches in test: {len(test_seg_loader)}")
+
+    train_dataset = MyDataSet(config.DATASETS_PATH, transform=train_transforms, train=True)
+
     train_dataset, val_dataset = torch.utils.data.random_split(
         train_dataset,
         [int(config.TRAIN_SIZE * len(train_dataset)), len(train_dataset) - int(config.TRAIN_SIZE * len(train_dataset))]
     )
 
-    val_dataset.transform = test_transforms
-    path_data_rrl1 = ["first_lap_datasets/big_dataset/rrl1/", "first_lap_datasets/scared_dataset/rrl1/"]
-    test_dataset = MyDataSet(path_data_rrl1, transform=train_transforms, train=True) 
-
-    print(f"Nb images in train: {len(train_dataset)}")
-    print(f"Nb images in val: {len(val_dataset)}")
-    print(f"Nb images in test: {len(test_dataset)}")
+    val_dataset.transform = train_transforms
+    test_dataset = MyDataSet(config.DATASETS_PATH, transform=train_transforms, train=False)
 
     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
     test_loader = DataLoader(test_dataset, batch_size=128, num_workers=8)
 
-    print(f"\nNb batches in train: {len(train_loader)}")
-    print(f"Nb batches in val: {len(val_loader)}")
-    print(f"Nb batches in test: {len(test_loader)}")
-
-    net_seg = CNNSeg()
-
-    net_seg.to(device)
-
-    #test_model_random(net, (2, 3, 120, 160))
-
-    optimizer = torch.optim.Adam(net_seg.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
-
-    train_model(net_seg, train_loader, val_loader, config.EPOCH, optimizer)
-
-    mse = nn.MSELoss()
-    #eval_model(net_seg, test_loader, mse, show=True)
-    torch.save(net.state_dict(), config.MODEL_SAVE_PATH_SEG)
-
     net = SegNvidia()
-    net.conv_seg = net_seg
-
-
-
-    torch.save(net.state_dict(), config.MODEL_SAVE_PATH_SEG)
-    torch.save(net.state_dict(), config.MODEL_SAVE_PATH)
+    net.conv_seg = conv_seg
+    head_train_model(net, train_loader, val_loader, test_loader, config.MODEL_SAVE_PATH, 20)
+    '''
