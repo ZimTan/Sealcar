@@ -14,6 +14,7 @@ import config
 from loader import MyDataSet
 from nvidia_speed import NvidiaSpeed
 from cnn_segmentation import CNNSeg
+from seg_nvidia import SegNvidia
 
 #Use GPU cuda if possible
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
@@ -132,9 +133,6 @@ def plot_acc_loss(train_accs, val_accs, train_losses, val_losses, nb_epochs):
 
 if __name__ == '__main__':
 
-    mean = 0
-    std = 0
-
     #create transforms
     train_transforms = transforms.Compose([
         transforms.ToPILImage(),
@@ -143,15 +141,7 @@ if __name__ == '__main__':
         #transforms.Normalize(mean, std),
     ])
 
-    test_transforms = transforms.Compose([
-        transforms.ToPILImage(),
-        transforms.Grayscale(),
-        transforms.ToTensor(),
-        #transforms.Normalize(mean, std),
-    ])
-
     train_dataset = MyDataSet(dataset_path, transform=train_transforms) 
-
     train_dataset, val_dataset = torch.utils.data.random_split(
         train_dataset,
         [int(config.TRAIN_SIZE * len(train_dataset)), len(train_dataset) - int(config.TRAIN_SIZE * len(train_dataset))]
@@ -167,24 +157,30 @@ if __name__ == '__main__':
 
     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=4, num_workers=0)
+    test_loader = DataLoader(test_dataset, batch_size=128, num_workers=8)
 
     print(f"\nNb batches in train: {len(train_loader)}")
     print(f"Nb batches in val: {len(val_loader)}")
     print(f"Nb batches in test: {len(test_loader)}")
 
-    #net = NvidiaSpeed()
-    net = CNNSeg()
+    net_seg = CNNSeg()
 
-    net.to(device)
+    net_seg.to(device)
 
     #test_model_random(net, (2, 3, 120, 160))
 
-    optimizer = torch.optim.Adam(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
+    optimizer = torch.optim.Adam(net_seg.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
 
-    train_model(net, train_loader, val_loader, config.EPOCH, optimizer)
+    train_model(net_seg, train_loader, val_loader, config.EPOCH, optimizer)
 
     mse = nn.MSELoss()
-    eval_model(net, test_loader, mse, show=True)
+    #eval_model(net_seg, test_loader, mse, show=True)
+    torch.save(net.state_dict(), config.MODEL_SAVE_PATH_SEG)
 
+    net = SegNvidia()
+    net.conv_seg = net_seg
+
+
+
+    torch.save(net.state_dict(), config.MODEL_SAVE_PATH_SEG)
     torch.save(net.state_dict(), config.MODEL_SAVE_PATH)
