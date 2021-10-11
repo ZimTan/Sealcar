@@ -14,9 +14,10 @@ SHUFFLE_DATA = False
 MODEL_NAME = "lstm"
 # available model are: nvidia-speed, lstm
 
-EPOCH = 10
+EPOCH = 15
 
 BATCH_SIZE = 128
+SEQUENCE_SIZE = 15
 
 LEARNING_RATE = 1e-3
 

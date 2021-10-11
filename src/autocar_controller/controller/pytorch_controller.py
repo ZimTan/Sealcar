@@ -48,9 +48,9 @@ class PytorchController(controller_interface.ControllerInterface):
             sys.exit(path + ': No such file or directory')
 
 
-        if (torch_config.MODEL_NAME == "nvidia-speed"):
+        if (conf.MODEL_TYPE == "nvidia-speed"):
             self.model = nvidia_speed.NvidiaSpeed()
-        elif (torch_config.MODEL_NAME == "lstm"):
+        elif (conf.MODEL_TYPE == "lstm"):
             self.model = lstm.LSTM()
 
         self.model.load_state_dict(torch.load(path + "/" + conf.MODEL_TYPE))
@@ -95,7 +95,7 @@ class PytorchController(controller_interface.ControllerInterface):
         image = self.segmentation(data['image'])
         image = self.transform(image)
 
-        if (torch_config.MODEL_NAME == "lstm"):
+        if (conf.MODEL_TYPE == "lstm"):
             image = np.expand_dims(image, axis=1)
             image = torch.FloatTensor(image)
 

@@ -49,10 +49,6 @@ def eval_model(net, loader, loss_fn):
         #x, y = x.to(device), y.to(device)
 
 
-        if (config.MODEL_NAME == "lstm"):
-            x = np.expand_dims(x, axis=1)
-            x = torch.FloatTensor(x)
-
         with torch.no_grad():
             # No need to compute gradient here thus we avoid storing intermediary activations
             logits = net(x.to(device)).cpu()
@@ -73,7 +69,7 @@ def eval_model(net, loader, loss_fn):
 
 
 def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
-    
+
     train_accs, train_losses = [], []
     val_accs, val_losses = [], []
 
@@ -91,25 +87,18 @@ def train_model(net, train_loader, val_loader, nb_epochs, optimizer):
 
         for x, y in train_loader:
 
-            if (config.MODEL_NAME == "lstm"):
-
-                #x = np.expand_dims(x, axis=1)
-                #x = torch.FloatTensor(x)
-                x = x.reshape((16, 8, config.IMAGE_DIM[2], config.IMAGE_DIM[0], config.IMAGE_DIM[1]))
-
             x = x.to(device)
             if (config.LOSS_FUNC == "cross-entropy"):
                 y = y.to(device, dtype=torch.long)
             else:
                 y = y.to(device)
 
+
             optimizer.zero_grad()  # Clear previous gradients
             logits = net(x)
+
             if (config.LOSS_FUNC == "cross-entropy"):
-                indices = torch.Tensor([16 * i - 1 for i in range(1, (config.BATCH_SIZE // 16) + 1)]).long()
-                y = torch.index_select(y, 0, indices)
-                print(y.shape)
-                loss = loss_fn(logits, torch.max(y, 1)[1])  
+                loss = loss_fn(logits, torch.max(y, 1)[1])
             else:
                 loss = loss_fn(logits, y)
             loss.backward()  # Compute gradients

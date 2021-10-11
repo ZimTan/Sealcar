@@ -16,7 +16,7 @@ class LSTM(nn.Module):
         self.cnn.classifier[1] = nn.Conv2d(512, 300, kernel_size=(1, 1), stride=(1, 1))
 
         # Concatenate 3 layers of LSTM to CNN backbone:
-        self.lstm = nn.LSTM(300, 256, num_layers=3, batch_first=True)
+        self.lstm = nn.LSTM(300, 256, num_layers=1, batch_first=True)
 
         self.fc1 = nn.Linear(256, 128)
         self.fc2 = nn.Linear(128, 2)
