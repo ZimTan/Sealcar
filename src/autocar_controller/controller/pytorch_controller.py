@@ -9,7 +9,9 @@ import config as conf
 import torch
 import torchvision
 from torchvision import transforms
+import pytorch.cnn_segmentation
 import pytorch.nvidia_speed as nvidia_speed
+import pytorch.seg_nvidia as seg_nvidia
 
 from pynput import keyboard
 from pynput.keyboard import Key
@@ -30,6 +32,8 @@ class PytorchController(controller_interface.ControllerInterface):
         self.listener.start()
 
         self.transform = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.Grayscale(),
             transforms.ToTensor(),
         ])
 
@@ -45,8 +49,8 @@ class PytorchController(controller_interface.ControllerInterface):
         if not os.path.isdir(path):
             sys.exit(path + ': No such file or directory')
 
-        self.model = nvidia_speed.NvidiaSpeed()
-        self.model.load_state_dict(torch.load(path + "/nvidia_speed"))
+        self.model = seg_nvidia.SegNvidia()
+        self.model.load_state_dict(torch.load(path + "/segnvidia"))
         self.model.eval()
 
     def _on_press(self, key):
@@ -85,8 +89,8 @@ class PytorchController(controller_interface.ControllerInterface):
         #        else:
         #            data['speed'] = self.default_speed
 
-        image = self.segmentation(data['image'])
-        image = self.transform(image)
+       # image = self.segmentation(data['image'])
+        image = self.transform(data['image'])
 
         result = self.model(image[None, ...])[0]
         print("Result : ", result) 
