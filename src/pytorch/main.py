@@ -150,8 +150,8 @@ def head_train_model(net, train_loader, val_loader, test_loader, save_path, epoc
     mse = nn.MSELoss()
 
     #tkt
-    if epoch < 22:
-        eval_model(net, test_loader, mse, show=True)
+   # if epoch < 22:
+    #    eval_model(net, test_loader, mse, show=True)
 
     torch.save(net.state_dict(), save_path)
     return net
@@ -186,7 +186,6 @@ if __name__ == '__main__':
 
     conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 20)
 
-    '''
     print(f"\nNb batches in train: {len(train_seg_loader)}")
     print(f"Nb batches in val: {len(val_seg_loader)}")
     print(f"Nb batches in test: {len(test_seg_loader)}")
@@ -208,4 +207,3 @@ if __name__ == '__main__':
     net = SegNvidia()
     net.conv_seg = conv_seg
     head_train_model(net, train_loader, val_loader, test_loader, config.MODEL_SAVE_PATH, 20)
-    '''
