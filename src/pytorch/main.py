@@ -150,7 +150,7 @@ def head_train_model(net, train_loader, val_loader, test_loader, save_path, epoc
     mse = nn.MSELoss()
 
     #tkt
-   # if epoch < 22:
+    #if epoch < 22:
     #    eval_model(net, test_loader, mse, show=True)
 
     torch.save(net.state_dict(), save_path)

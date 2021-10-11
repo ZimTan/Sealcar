@@ -2,9 +2,9 @@
 
 IMAGE_DIM = (120, 160, 1)
 
-DATASETS_SEG_PATH = [("dataset/first_lap_datasets/scared_dataset/rrl1", "dataset/first_lap_datasets/scared_dataset/fragmented_rrl1")]
+DATASETS_SEG_PATH = [("dataset/first_lap_datasets/scared_dataset/rrl1", "dataset/first_lap_datasets/scared_dataset/fragmented_rrl1"), ("dataset/first_lap_datasets/big_dataset/rrl1", "dataset/first_lap_datasets/big_dataset/fragmented_rrl1")]
 
-DATASETS_PATH = ["dataset/first_lap_datasets/scared_dataset/rrl1"]
+DATASETS_PATH = ["dataset/first_lap_datasets/scared_dataset/rrl1", "dataset/first_lap_datasets/big_dataset/rrl1"]
 MODEL_SAVE_PATH_SEG = "src/pytorch/models/cnnseg"
 MODEL_SAVE_PATH = "src/pytorch/models/segnvidia"
 

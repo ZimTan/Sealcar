@@ -5,11 +5,41 @@ import torch
 from torch.utils.data import Dataset
 
 import numpy as np
+import skimage
+import skimage.morphology
+from skimage.color import rgb2gray
+from skimage.morphology import diamond
 import matplotlib.pyplot as plt
 from torchvision import transforms
 
 from json import load as jsonload
 
+class Erosion:
+
+    def __init__(self, radius=3):
+        self.radius = radius
+
+    def __call__(self, x):
+        diamon = diamond(self.radius)
+        x = skimage.morphology.erosion(x, diamon)
+        return x
+       
+class Morphology:
+
+    def __init__(self, radius=3):
+        self.radius = radius
+
+    def __call__(self, x):
+        diamon = diamond(self.radius)
+        #x = skimage.morphology.opening(x, diamon)
+        #x = skimage.morphology.closing(x, diamon)
+        x = rgb2gray(x)
+        #x = skimage.morphology.remove_small_holes(x) 
+        x = skimage.morphology.remove_small_objects((x > 0), min_size=3)
+        x = skimage.morphology.dilation(x, diamon)
+        x = x.astype("float32")
+        return x
+        
 class AddNoise:
    # def __init__(self):
     def __call__(self, x):
@@ -38,6 +68,15 @@ class SegDataSet(Dataset):
             transforms.Grayscale(),
             transforms.ToTensor(),
         ])
+
+
+        self.output_transforms = transforms.Compose([
+            Morphology(2),
+            transforms.ToPILImage(),
+            #transforms.Grayscale(),
+            transforms.ToTensor(),
+        ])
+
 
         count = 0
 
@@ -70,7 +109,7 @@ class SegDataSet(Dataset):
 
         image = np.load(image_name)
         image_seg = np.load(image_seg_name)
-
+ 
         if self.transform:
             image = self.transform(image)
 
@@ -78,17 +117,18 @@ class SegDataSet(Dataset):
             image = self.input_transforms(image_seg.copy())
 
         if self.transform:
+            image_seg2 = self.output_transforms(image_seg.copy())
             image_seg = self.transform(image_seg)
 
 
+        """
+        f, ax = plt.subplots(2)
+        ax[0].imshow(image_seg.squeeze(dim=0), cmap='gray')
+        ax[1].imshow(image_seg2.squeeze(dim=0), cmap='gray')
+        plt.show()
+        """
 
-       # f, ax = plt.subplots(2)
-       # ax[0].imshow(image_seg.squeeze(dim=0), cmap='gray')
-       # ax[1].imshow(image.squeeze(dim=0), cmap='gray')
-       # plt.show()
-
-
-        sample = (image, image_seg)
+        sample = (image, image_seg2)
 
         return sample
 
