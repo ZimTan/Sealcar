@@ -23,7 +23,7 @@ class Erosion:
         diamon = diamond(self.radius)
         x = skimage.morphology.erosion(x, diamon)
         return x
-       
+
 class Morphology:
 
     def __init__(self, radius=3):
@@ -39,13 +39,23 @@ class Morphology:
         x = skimage.morphology.dilation(x, diamon)
         x = x.astype("float32")
         return x
-        
+
 class AddNoise:
    # def __init__(self):
     def __call__(self, x):
         mask = np.ma.masked_where(x<=220, x).mask
         x[mask] = np.random.randint(random.randint(170,255), size=x.shape)[mask] 
         return x
+
+class AddBlur:
+    def __call__(self, x, image_seg):
+
+        mask = image_seg == 255
+        save = x.copy().astype("float64") / 255.0
+        x = skimage.filters.gaussian(x.copy(), sigma=random.randint(0, 1), multichannel=False)
+        x[mask] = save[mask]
+        x = x * 255
+        return x.astype("uint8")
 
 class RemoveTop:
    # def __init__(self):
@@ -64,6 +74,12 @@ class SegDataSet(Dataset):
 
         self.input_transforms = transforms.Compose([
             AddNoise(),
+            transforms.ToPILImage(),
+            transforms.Grayscale(),
+            transforms.ToTensor(),
+        ])
+
+        self.blur_transforms = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Grayscale(),
             transforms.ToTensor(),
@@ -108,12 +124,19 @@ class SegDataSet(Dataset):
             image_seg_name = '/'.join(json_seg_id.split('/')[:-1]) + '/image_' + json_seg_id.split('/')[-1][5:-5] + '.npy'
 
         image = np.load(image_name)
+        image_save = image.copy()
         image_seg = np.load(image_seg_name)
- 
+
         if self.transform:
             image = self.transform(image)
 
         if random.randint(0, 5) == 1:
+
+            image = AddBlur()(image_save, image_seg)
+            image = self.blur_transforms(image)
+
+
+        elif random.randint(0, 5) == 1:
             image = self.input_transforms(image_seg.copy())
 
         if self.transform:
@@ -121,12 +144,10 @@ class SegDataSet(Dataset):
             image_seg = self.transform(image_seg)
 
 
-        """
-        f, ax = plt.subplots(2)
-        ax[0].imshow(image_seg.squeeze(dim=0), cmap='gray')
-        ax[1].imshow(image_seg2.squeeze(dim=0), cmap='gray')
-        plt.show()
-        """
+       # f, ax = plt.subplots(2)
+       # ax[0].imshow(image.squeeze(dim=0), cmap='gray')
+       # ax[1].imshow(image_seg2.squeeze(dim=0), cmap='gray')
+       # plt.show()
 
         sample = (image, image_seg2)
 
