@@ -2,3 +2,16 @@ This is the best donkeyCar ever, We will name it SEALCar !
 
 
 Il y a une branche ou la voiture se lance et fait un bout de chemin hardcoder tous en recordant. Ca permet de faire un dataset parfait. Juste lancer le simulator puis lancer le main.py dans src. Le path du data set est a gerer dans le config.py dans src !
+
+
+Autonomous driving :
+
+got in ssh to the pi with the nano : ssh pi@10.42.0.2
+
+faire :
+sudo pigpiod
+roslaunch catkin_ws/src/car******-launchers/launch/car-*******
+
+puis lancer sur la nano :
+
+python3 pytorch/autonomous.py
