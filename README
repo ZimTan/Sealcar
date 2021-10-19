@@ -10,7 +10,7 @@ got in ssh to the pi with the nano : ssh pi@10.42.0.2
 
 faire :
 sudo pigpiod
-roslaunch catkin_ws/src/car******-launchers/launch/car-*******
+roslaunch catkin_ws/src/ros-rpi-car-launchers/launch/car_launcher.launch
 
 puis lancer sur la nano :
 
