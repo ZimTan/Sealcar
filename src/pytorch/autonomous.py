@@ -29,6 +29,7 @@ if not cam :
 
 transform = transforms.Compose([
     transforms.ToPILImage(),
+    transforms.Resize((120, 160)),
     transforms.Grayscale(),
     transforms.ToTensor(),
 ])
@@ -50,6 +51,7 @@ if not os.path.isdir(path):
 model = seg_nvidia.SegNvidia()
 model.load_state_dict(torch.load(path + "segnvidia"))
 model.eval()
+model.to(device)
 
 # ********** LOOP *********
 
@@ -62,18 +64,24 @@ for i in range(5):
 
     cam.wait_for_frames()
     #Prepossesing
-    print("img : " + str(cam.color.shape))
     image = cam.color.copy()
     print("img : " + str(image.shape))
     image = transform(image)
     print(image.shape)
+    print(image)
 
     #Inference
-    #result = self.model(image[None, ...])[0]
-    result = [0,0]
+    with torch.no_grad():
+        result = model(image[None, ...].to(device)).cpu()
+    result = result[0]
     print("Result : ", result) 
+    print("Result : ", result[0].item()) 
 
-    msg = f"{result[0]};{result[0]};pilot".encode("utf-8")
+    throtle = round(result[0].item(), 2)
+    steer = round(result[1].item(), 2)
+    print(throtle, steer)
+
+    msg = f"{throtle};{steer};pilot".encode("utf-8")
     print(msg)
 
     #Send result to ros car
