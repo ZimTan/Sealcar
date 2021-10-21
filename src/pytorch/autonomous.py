@@ -3,12 +3,16 @@ import os
 import torch
 import torchvision
 from torchvision import transforms
+from torchvision.utils import save_image
 import nvidia_speed as nvidia_speed
 import seg_nvidia as seg_nvidia
 
 import pyrealsense as pyrs
 
 import socket
+import time
+
+SAVE_IMG = True
 
 #********* INIT ********
 
@@ -50,44 +54,57 @@ if not os.path.isdir(path):
 
 model = seg_nvidia.SegNvidia()
 model.load_state_dict(torch.load(path + "segnvidia"))
+print("model is loaded.")
 model.eval()
 model.to(device)
 
 # ********** LOOP *********
-
-#while True
-for i in range(5):
-    print("LOOP")
+count = 0
+time_start = time.time()
+print("Loop begin ...")
+while True:
+#for i in range(50):
+    print(count)
+    count += 1
+    #print("LOOP")
 
     #Get image
-    print("Get image")
-
+    #print("Get image")
     cam.wait_for_frames()
+
     #Prepossesing
     image = cam.color.copy()
-    print("img : " + str(image.shape))
+    #print("img : " + str(image.shape))
+    print("coucou")
     image = transform(image)
-    print(image.shape)
-    print(image)
+    if SAVE_IMG:
+        save_image(image, "imgs/img-" + str(count) + ".png")
+    #print(image.shape)
+    #print(image)
 
     #Inference
+    print("Inference")
     with torch.no_grad():
         result = model(image[None, ...].to(device)).cpu()
     result = result[0]
-    print("Result : ", result) 
-    print("Result : ", result[0].item()) 
 
-    throtle = round(result[0].item(), 2)
-    steer = round(result[1].item(), 2)
+    throtle = round(result[0].item(), 3) + 0.5
+    steer = round(result[1].item(), 3) + 0.5
     print(throtle, steer)
 
-    msg = f"{throtle};{steer};pilot".encode("utf-8")
-    print(msg)
+    msg1 = f"{throtle};{steer};pilot".encode("utf-8")
+    msg2 = f"{throtle};{steer};pilot;{count}".encode("utf-8")
+    print(msg1)
 
     #Send result to ros car
-    sock.sendto(msg, (UDP_IP, UDP_PORT))
-    print("Msg send")
-    #sleep(1)
+    sock.sendto(msg1, (UDP_IP, UDP_PORT))
+    sock.sendto(msg2, (UDP_IP, UDP_PORT + 1))
+    #print("Msg send")
+
+    time_end = time.time()
+    print(time_end - time_start)
+    print()
+    time_start = time_end
 
 cam.stop()
 serv.stop()
