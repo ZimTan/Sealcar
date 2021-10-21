@@ -2,10 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import glob
+import os
 
-dataset_path = "dataset/first_lap_datasets/big_dataset/rrl1/"
-frag_dataset_path = "dataset/first_lap_datasets/big_dataset/fragmented2_rrl1/"
+dataset_path = "/home/banner/Sealcar/dataset/21-17-34-062137/"
+frag_dataset_path = "/home/banner/Sealcar/dataset/21-17-34-062137/frag/"
 
+imgs = []
+#for img in os.listdir(dataset_path):
+#    imgs.append(dataset_path + img)
 
 imgs = glob.glob(dataset_path + "*.npy")
 if (len(imgs) == 0):
@@ -14,12 +18,14 @@ if (len(imgs) == 0):
 
 print(f'There are {len(imgs)} images in dataset.')
 
-THRESHOLD = 210
+THRESHOLD = 200
 HORIZON = 50
-
+#print(imgs[0])
 for img in imgs:
 
+    print(img)
     np_img = np.load(img)
+    #np_img = cv2.imread(img)
 
     hls_img = cv2.cvtColor(np_img, cv2.COLOR_BGR2HLS)
     lum_img = hls_img[:,:,1]
@@ -36,9 +42,11 @@ for img in imgs:
     print(f'image {img.split("/")[-1]} saved.')
 
     img2 = np.load(img)
+   # img2 = cv2.imread(img)
 
     img_grey = 0.299 * img2[:,:,0] +  0.587 * img2[:,:,2] +  0.114 * img2[:,:,2] 
-    #axs[0].imshow(img_grey, cmap='gray', vmin=0, vmax=255)
+   # plt.imshow(img_grey, cmap='gray', vmin=0, vmax=255)
+    #plt.show()
 
     img_grey[:HORIZON,:] = 0
 
@@ -101,13 +109,13 @@ for img in imgs:
             else:
                 img_grey[i,j] = 0
             j -= 1
-    """
 
+    ''' 
     fig, axs = plt.subplots(ncols=2)
     axs[0].imshow(final_img)
     axs[1].imshow(img_grey)
     plt.show()
-    """
+    '''
 
     final_img = cv2.merge((img_grey, img_grey, img_grey))
     print(final_img.flatten() > 0)

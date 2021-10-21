@@ -29,7 +29,7 @@ if not cam :
 
 transform = transforms.Compose([
     transforms.ToPILImage(),
-    transforms.Resize((120, 160)),
+    #transforms.Resize((120, 160)),
     transforms.Grayscale(),
     transforms.ToTensor(),
 ])

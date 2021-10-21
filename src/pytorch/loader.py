@@ -64,10 +64,11 @@ class RemoveTop:
 
 class SegDataSet(Dataset):
 
-    def __init__(self, directories, transform=None, train=True):
+    def __init__(self, directories, seg_directories, transform=None, train=True):
 
         self.transform = transform
         self.directories = directories
+        self.seg_directories = seg_directories
         self.json_ids = []
         self.json_seg_ids = []
         self.train = train
@@ -96,8 +97,8 @@ class SegDataSet(Dataset):
 
         count = 0
 
-        for (dir, dir_seg) in directories:
-            for x in os.listdir(dir_seg):
+        for i in range(len(directories)):
+            for x in os.listdir(self.seg_directories[i]):
                 if ".json" in x and x != "meta.json":
 
                     count += 1
@@ -106,8 +107,8 @@ class SegDataSet(Dataset):
                     if not self.train and count % 10 != 0:
                         continue
 
-                    self.json_ids.append(os.path.join(dir, x))
-                    self.json_seg_ids.append(os.path.join(dir_seg, x))
+                    self.json_ids.append(os.path.join(self.directories[i], x))
+                    self.json_seg_ids.append(os.path.join(self.seg_directories[i], x))
 
     def __len__(self):
         return len(self.json_ids)
@@ -118,14 +119,16 @@ class SegDataSet(Dataset):
         json_seg_id = self.json_seg_ids[idx]
 
         with open(json_id) as json:
-            image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
+            #image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
+            image_name = '/'.join(json_id.split('/')[:-1]) + '/' + json_id.split('/')[-1][:-5] + '.npy'
 
         with open(json_seg_id) as json:
-            image_seg_name = '/'.join(json_seg_id.split('/')[:-1]) + '/image_' + json_seg_id.split('/')[-1][5:-5] + '.npy'
+            #image_seg_name = '/'.join(json_seg_id.split('/')[:-1]) + '/image_' + json_seg_id.split('/')[-1][5:-5] + '.npy'
+            image_seg_name = '/'.join(json_seg_id.split('/')[:-1]) + '/' + json_seg_id.split('/')[-1][:-5] + '.npy'
 
         image = np.load(image_name)
         image_save = image.copy()
-        image_seg = np.load(image_seg_name)
+        image_seg = np.load(image_seg_name).astype("uint8")
 
         if self.transform:
             image = self.transform(image)
@@ -143,11 +146,12 @@ class SegDataSet(Dataset):
             image_seg2 = self.output_transforms(image_seg.copy())
             image_seg = self.transform(image_seg)
 
-
-       # f, ax = plt.subplots(2)
-       # ax[0].imshow(image.squeeze(dim=0), cmap='gray')
-       # ax[1].imshow(image_seg2.squeeze(dim=0), cmap='gray')
-       # plt.show()
+        '''
+        f, ax = plt.subplots(2)
+        ax[0].imshow(image.squeeze(dim=0), cmap='gray')
+        ax[1].imshow(image_seg2.squeeze(dim=0), cmap='gray')
+        plt.show()
+        '''
 
         sample = (image, image_seg2)
 

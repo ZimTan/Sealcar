@@ -167,14 +167,14 @@ if __name__ == '__main__':
         #transforms.Normalize(mean, std),
     ])
 
-    train_seg_dataset = SegDataSet(config.DATASETS_SEG_PATH, transform=train_transforms) 
+    train_seg_dataset = SegDataSet(config.DATASETS_PATH, config.DATASETS_SEG_PATH, transform=train_transforms) 
     train_seg_dataset, val_seg_dataset = torch.utils.data.random_split(
         train_seg_dataset,
         [int(config.TRAIN_SIZE * len(train_seg_dataset)), len(train_seg_dataset) - int(config.TRAIN_SIZE * len(train_seg_dataset))]
     )
 
     val_seg_dataset.transform = train_transforms
-    test_seg_dataset = SegDataSet(config.DATASETS_SEG_PATH, transform=train_transforms, train=False) 
+    test_seg_dataset = SegDataSet(config.DATASETS_PATH, config.DATASETS_SEG_PATH, transform=train_transforms, train=False) 
 
     print(f"Nb images in train: {len(train_seg_dataset)}")
     print(f"Nb images in val: {len(val_seg_dataset)}")

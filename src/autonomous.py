@@ -11,6 +11,7 @@ import pytorch.seg_nvidia as seg_nvidia
 transform = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Grayscale(),
+    transforms.Resize((120, 160))
     transforms.ToTensor(),
 ])
 
