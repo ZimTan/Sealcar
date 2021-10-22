@@ -110,9 +110,8 @@ class SegDataSet(Dataset):
                     if not self.train and count % 10 != 0:
                         continue
 
-                    if random.randint(0, 10) == 1:
-                        self.json_ids.append(os.path.join(self.directories[i], x))
-                        self.json_seg_ids.append(os.path.join(self.seg_directories[i], x))
+                    self.json_ids.append(os.path.join(self.directories[i], x))
+                    self.json_seg_ids.append(os.path.join(self.seg_directories[i], x))
 
     def __len__(self):
         return len(self.json_ids)
