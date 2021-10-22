@@ -194,7 +194,8 @@ class MyDataSet(Dataset):
             j = jsonload(json)
 
             label = np.array([j['steer'], j['throttle']])
-            image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
+            #image_name = '/'.join(json_id.split('/')[:-1]) + '/image_' + json_id.split('/')[-1][5:-5] + '.npy'
+            image_name = '/'.join(json_id.split('/')[:-1]) + '/' + json_id.split('/')[-1][:-5] + '.npy'
 
         image = np.load(image_name)
 
