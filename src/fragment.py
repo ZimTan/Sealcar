@@ -4,8 +4,8 @@ import cv2
 import glob
 import os
 
-dataset_path = "/home/banner/Sealcar/dataset/21-17-34-062137/"
-frag_dataset_path = "/home/banner/Sealcar/dataset/21-17-34-062137/frag/"
+dataset_path = "/home/corentin/SEAL/donkeyCar/Sealcar/dataset_real/21-16-51-573448/"
+frag_dataset_path = "/home/corentin/SEAL/donkeyCar/Sealcar/dataset_real/21-16-51-573448/frag/"
 
 imgs = []
 #for img in os.listdir(dataset_path):
@@ -36,10 +36,10 @@ for img in imgs:
     cropped_img[:50,:] = 0
 
     final_img = cv2.merge((cropped_img, cropped_img, cropped_img))
-    print(final_img.flatten())
+    #print(final_img.flatten())
 
     #np.save(frag_dataset_path + img.split('/')[-1], final_img)
-    print(f'image {img.split("/")[-1]} saved.')
+    #print(f'image {img.split("/")[-1]} saved.')
 
     img2 = np.load(img)
    # img2 = cv2.imread(img)
@@ -118,5 +118,5 @@ for img in imgs:
     '''
 
     final_img = cv2.merge((img_grey, img_grey, img_grey))
-    print(final_img.flatten() > 0)
+    #print(final_img.flatten() > 0)
     np.save(frag_dataset_path + img.split('/')[-1], final_img)

@@ -35,7 +35,7 @@ dataset_path = config.DATASETS_PATH
 """
 def test_model_random(net, input_shape):
     logits = net(torch.randn(input_shape).to(device))
-    print(f"Logits shape: {logits.shape}")
+    #print(f"Logits shape: {logits.shape}")
 
 """
 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     val_seg_loader = DataLoader(val_seg_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
     test_seg_loader = DataLoader(test_seg_dataset, batch_size=128, num_workers=8)
 
-    conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 12)
+    conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 1)
 
     print(f"\nNb batches in train: {len(train_seg_loader)}")
     print(f"Nb batches in val: {len(val_seg_loader)}")
