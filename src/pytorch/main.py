@@ -143,7 +143,7 @@ def head_train_model(net, train_loader, val_loader, test_loader, save_path, epoc
     #test_model_random(net, (2, 3, 120, 160))
 
     optimizer = torch.optim.Adam(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
-   # optimizer = torch.optim.SGD(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
+    #optimizer = torch.optim.SGD(net.parameters(), lr=config.LEARNING_RATE)#, momentum=0.9, nesterov=True)
 
     train_model(net, train_loader, val_loader, epoch, optimizer)
 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     val_seg_loader = DataLoader(val_seg_dataset, batch_size=config.BATCH_SIZE, num_workers=8)
     test_seg_loader = DataLoader(test_seg_dataset, batch_size=128, num_workers=8)
 
-    conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 1)
+    conv_seg = head_train_model(CNNSeg(), train_seg_loader, val_seg_loader, test_seg_loader, config.MODEL_SAVE_PATH_SEG, 10)
 
     print(f"\nNb batches in train: {len(train_seg_loader)}")
     print(f"Nb batches in val: {len(val_seg_loader)}")
@@ -207,4 +207,4 @@ if __name__ == '__main__':
 
     net = SegNvidia()
     net.conv_seg = conv_seg
-    head_train_model(net, train_loader, val_loader, test_loader, config.MODEL_SAVE_PATH, 20)
+    head_train_model(net, train_loader, val_loader, test_loader, config.MODEL_SAVE_PATH, 6)
