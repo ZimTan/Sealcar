@@ -110,8 +110,9 @@ class SegDataSet(Dataset):
                     if not self.train and count % 10 != 0:
                         continue
 
-                    self.json_ids.append(os.path.join(self.directories[i], x))
-                    self.json_seg_ids.append(os.path.join(self.seg_directories[i], x))
+                    if random.randint(0, 10) == 1:
+                        self.json_ids.append(os.path.join(self.directories[i], x))
+                        self.json_seg_ids.append(os.path.join(self.seg_directories[i], x))
 
     def __len__(self):
         return len(self.json_ids)
@@ -136,10 +137,10 @@ class SegDataSet(Dataset):
         if self.transform:
             image = self.transform(image)
 
-        if random.randint(0, 5) == 1:
+ #       if random.randint(0, 5) == 1:
 
-            image = AddBlur()(image_save, image_seg)
-            image = self.blur_transforms(image)
+           # image = AddBlur()(image_save, image_seg)
+           # image = self.blur_transforms(image)
 
 
         elif random.randint(0, 5) == 1:
@@ -203,12 +204,12 @@ class MyDataSet(Dataset):
             image = self.transform(image)
             label = torch.tensor(label)
 
-        """
+        '''
         f, ax = plt.subplots(2)
         ax[0].imshow(in_image.squeeze(dim=0), cmap='gray')
         ax[1].imshow(image.squeeze(dim=0), cmap='gray')
         plt.show()
-        """
+        '''
 
         sample = (image, label.float())
 

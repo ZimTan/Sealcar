@@ -7,9 +7,11 @@ DATASETS_SEG_PATH = ["dataset_real/21-16-44-867066/frag"]
 
 DATASETS_PATH = ["dataset_real/21-16-44-867066"]
 
-#DATASETS_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066", "/home/banner/Sealcar/dataset/21-16-51-573448", "/home/banner/Sealcar/dataset/21-17-28-237168", "/home/banner/Sealcar/dataset/21-17-34-062137"]
+DATASETS_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066", "/home/banner/Sealcar/dataset/21-16-51-573448", "/home/banner/Sealcar/dataset/21-17-28-237168", "/home/banner/Sealcar/dataset/21-17-34-062137"]
 
-#DATASETS_SEG_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066/frag", "/home/banner/Sealcar/dataset/21-16-51-573448/frag", "/home/banner/Sealcar/dataset/21-17-28-237168/frag", "/home/banner/Sealcar/dataset/21-17-34-062137/frag"]
+DATASETS_SEG_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066/frag", "/home/banner/Sealcar/dataset/21-16-51-573448/frag", "/home/banner/Sealcar/dataset/21-17-28-237168/frag", "/home/banner/Sealcar/dataset/21-17-34-062137/frag"]
+#DATASETS_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066"]
+
 
 MODEL_SAVE_PATH = "src/pytorch/models/segnvidia"
 MODEL_SAVE_PATH_SEG = "src/pytorch/models/cnnseg"

@@ -57,10 +57,12 @@ def eval_model(net, loader, loss_fn, show=False):
             with torch.no_grad():
                 logits = net(x.to(device)).cpu()
 
+            '''
             f, ax = plt.subplots(2)
             ax[0].imshow(x[0].squeeze(dim=0), cmap='gray')
             ax[1].imshow(logits[0].squeeze(dim=0), cmap='gray')
             plt.show()
+            '''
         return 0, 0;
 
     for x, y in loader:
@@ -151,7 +153,7 @@ def head_train_model(net, train_loader, val_loader, test_loader, save_path, epoc
 
     #tkt
     #if epoch < 22:
-    #    eval_model(net, test_loader, mse, show=True)
+   # eval_model(net, test_loader, mse, show=True)
 
     torch.save(net.state_dict(), save_path)
     return net
