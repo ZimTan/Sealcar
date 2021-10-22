@@ -162,6 +162,7 @@ if __name__ == '__main__':
     #create transforms
     train_transforms = transforms.Compose([
         transforms.ToPILImage(),
+        transforms.Resize((120, 160)),
         transforms.Grayscale(),
         transforms.ToTensor(),
         #transforms.Normalize(mean, std),

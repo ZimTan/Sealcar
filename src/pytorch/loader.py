@@ -76,12 +76,14 @@ class SegDataSet(Dataset):
         self.input_transforms = transforms.Compose([
             AddNoise(),
             transforms.ToPILImage(),
+            transforms.Resize((120, 160)),
             transforms.Grayscale(),
             transforms.ToTensor(),
         ])
 
         self.blur_transforms = transforms.Compose([
             transforms.ToPILImage(),
+            transforms.Resize((120, 160)),
             transforms.Grayscale(),
             transforms.ToTensor(),
         ])
@@ -90,6 +92,7 @@ class SegDataSet(Dataset):
         self.output_transforms = transforms.Compose([
             Morphology(2),
             transforms.ToPILImage(),
+            transforms.Resize((120, 160)),
             #transforms.Grayscale(),
             transforms.ToTensor(),
         ])
