@@ -4,13 +4,8 @@ import cv2
 import glob
 import os
 
-<<<<<<< HEAD
-dataset_path = "/home/corentin/SEAL/donkeyCar/Sealcar/dataset_real/21-16-51-573448/"
-frag_dataset_path = "/home/corentin/SEAL/donkeyCar/Sealcar/dataset_real/21-16-51-573448/frag/"
-=======
 dataset_path = "/home/tanz/Bureau/data_sealcar/"
 frag_dataset_path = "/home/tanz/Bureau/data_sealcar/frag/"
->>>>>>> 94b05d3 ([UPDATE] fragmentation)
 
 imgs = []
 LEFT = 0
