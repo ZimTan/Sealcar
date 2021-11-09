@@ -3,14 +3,9 @@
 #IMAGE_DIM = (120, 160, 1)
 IMAGE_DIM = (480, 640, 1)
 
-DATASETS_SEG_PATH = ["dataset_real/21-16-44-867066/frag"] 
+DATASETS_SEG_PATH = ["dataset_real/23-14-47-853175/frag"] 
 
-DATASETS_PATH = ["dataset_real/21-16-44-867066"]
-
-DATASETS_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066", "/home/banner/Sealcar/dataset/21-16-51-573448", "/home/banner/Sealcar/dataset/21-17-28-237168", "/home/banner/Sealcar/dataset/21-17-34-062137"]
-
-DATASETS_SEG_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066/frag", "/home/banner/Sealcar/dataset/21-16-51-573448/frag", "/home/banner/Sealcar/dataset/21-17-28-237168/frag", "/home/banner/Sealcar/dataset/21-17-34-062137/frag"]
-#DATASETS_PATH = ["/home/banner/Sealcar/dataset/21-16-44-867066"]
+DATASETS_PATH = ["dataset_real/23-14-47-853175"]
 
 
 MODEL_SAVE_PATH = "src/pytorch/models/segnvidia"
@@ -23,10 +18,11 @@ TEST_SIZE = 0.1
 MODEL_NAME = "nvidia-speed"
 # available model are: nvidia-speed, lstm
 
-EPOCH_SEG = 1
 EPOCH_SEG = 10
 
-BATCH_SIZE = 8
+EPOC_CNN = 30
+
+BATCH_SIZE = 128
 
 LEARNING_RATE = 1e-3
 
